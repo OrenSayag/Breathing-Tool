@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import Diaphragm from "./components/Diaphragm";
 import PlayPauseBtn from "./components/PlayPauseBtn";
 import breathingExercises from "./data/breathing-excercie";
-import useBreathTimer from "./hooks/useBreathTimer";
+import useBreathTimer, { Cues } from "./hooks/useBreathTimer";
 import BreathingExercise from "./types/BreathingExecrise";
 import BreathTimerState from "./types/BreathTimerState";
+import CueSelector from "./components/cue-selector";
 
 function App() {
   const [exercise, setExercise] = useState<BreathingExercise>(
@@ -13,7 +14,6 @@ function App() {
   );
   const getVolume = () => {
     const volume = localStorage.getItem("volume");
-    console.log({ lsVolume: volume });
     if (!Number.isNaN(Number(volume))) {
       return Number(volume);
     }
@@ -21,9 +21,20 @@ function App() {
   };
   const setLocalstorageVolume = (volume: number) => {
     localStorage.setItem("volume", volume.toString());
-    setVolume(volume);
+  };
+
+  const getCue = () => {
+    const cue = localStorage.getItem("cue");
+    if (Object.values(Cues).includes(cue as Cues)) {
+      return cue as Cues;
+    }
+    return undefined;
+  };
+  const setLocalstorageCue = (cue: Cues) => {
+    localStorage.setItem("cue", cue);
   };
   const [volume, setVolume] = useState<number>(getVolume());
+  const [cue, setCue] = useState<Cues>(getCue() ?? Cues.DEFAULT);
   const [breathTimerState, setBreathTimerState] = useState<BreathTimerState>({
     stage: 4,
     timeToZero: 10,
@@ -34,6 +45,7 @@ function App() {
     breathTimerState,
     setBreathTimerState,
     volume,
+    cues: cue,
   });
   return (
     <div className="min-h-screen min-h-screen bg-primary text-white flex flex-col items-center">
@@ -58,7 +70,7 @@ function App() {
           {breathTimerState.isActive &&
             determineGuideline(breathTimerState.stage)}
         </div>
-        <div className="absolute bottom-2 left-2">
+        <div className="absolute bottom-2 left-2 w-full flex justify-between items-center pr-6">
           <input
             type="range"
             value={volume * 100}
@@ -70,6 +82,13 @@ function App() {
             max={100}
             name=""
             id=""
+          />
+          <CueSelector
+            onSelected={(c) => {
+              setCue(c);
+              setLocalstorageCue(c);
+            }}
+            value={cue}
           />
         </div>
       </div>

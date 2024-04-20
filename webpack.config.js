@@ -1,4 +1,5 @@
-const publicPath = "/breath"
+const { appPrefix } = require("./src/constants");
+const publicPath = appPrefix;
 
 module.exports = {
   output: {
@@ -10,4 +11,4 @@ module.exports = {
       index: publicPath,
     },
   },
-}
+};

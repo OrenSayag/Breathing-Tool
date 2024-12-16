@@ -66,7 +66,7 @@ export default (params: Params) => {
       setBreathTimerState({
         ...breathTimerState,
         stage: nextStage as 1 | 2 | 3 | 4,
-        timeToZero: exercise[nextStage as 1 | 2 | 3 | 4] * 1_000,
+        timeToZero: exercise [nextStage as 1 | 2 | 3 | 4] * 1_000,
       });
     }
   }, [timeToZero, isActive]);

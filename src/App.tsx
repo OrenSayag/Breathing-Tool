@@ -8,6 +8,8 @@ import BreathingExercise from "./types/BreathingExecrise";
 import BreathTimerState from "./types/BreathTimerState";
 import CueSelector from "./components/cue-selector";
 import ExerciseSelector from "./components/exercise-selector";
+import {Timer} from "./components/timer";
+import {playTimerEnd} from "./services/utilities/audio/play-timer-end";
 
 function App() {
     const getExercise = () => {
@@ -42,6 +44,16 @@ function App() {
 
     const setLocalstorageCue = (cue: Cues) => {
         localStorage.setItem("cue", cue);
+    };
+    const setLocalstorageTimer = (timer_amountOfSeconds: number) => {
+        localStorage.setItem("timer_amountOfSeconds", timer_amountOfSeconds.toString());
+    };
+    const getLocalstorageTimer = (): Number | undefined => {
+        const val =  localStorage.getItem("timer_amountOfSeconds");
+        if(Number.isNaN(Number(val))) {
+            return undefined;
+        }
+        return Number(val)
     };
     const setLocalstorageExercise = (ex: Exercise) => {
         localStorage.setItem("exercise", ex.name);
@@ -115,6 +127,30 @@ function App() {
                     </div>
                 </div>
             </div>
+            <Timer
+                className={'absolute top-6 right-6'}
+                data={{
+                    onEnd() {
+                        playTimerEnd()
+                    },
+                    onSetAmountOfSeconds(aos: number) {
+                        setLocalstorageTimer(aos)
+                    },
+                    amountOfSeconds: getLocalstorageTimer() as number,
+                    onPlay() {
+                        setBreathTimerState(prev=>({...prev, isActive: true}))
+                    },
+                    onPause() {
+                        setBreathTimerState(prev=>({...prev, isActive: false}))
+                    },
+                    onStop() {
+                        setBreathTimerState({
+                            stage: 4,
+                            timeToZero: 10,
+                            isActive: false,
+                        })
+                    }
+                }}/>
         </div>
     );
 }
